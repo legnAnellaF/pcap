@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
-#include <pcap/pcap.h>
+#include <pcap.h>
 #include "header.h"
 
 void pcap_fatal(const char *, const char *);
@@ -13,8 +13,7 @@ void caught_packet(unsigned char *, const struct pcap_pkthdr *, const unsigned c
 
 int main()
 {
-    struct pcap_pkthdr *cap_header;
-    const unsigned char *packet, *pkt_data;
+
     char errbuf[PCAP_ERRBUF_SIZE];
     char *device;
     pcap_t *pcap_handle;
@@ -37,7 +36,6 @@ int main()
 void caught_packet(unsigned char *user_args, const pcap_pkthdr *cap_header, const unsigned char *packet)
 {
     int tcp_header_length, total_header_size, pkt_data_len;
-    unsigned char *pkt_data;
 
     printf("==== %dByte packets receive ====\n", cap_header->len);
 
@@ -46,7 +44,6 @@ void caught_packet(unsigned char *user_args, const pcap_pkthdr *cap_header, cons
     tcp_header_length = decode_tcp(packet + ETHER_HDR_LEN + sizeof(struct ip_header));
 
     total_header_size = ETHER_HDR_LEN + sizeof(struct ip_header) + tcp_header_length;
-    pkt_data = (unsigned char *)packet + total_header_size;
     pkt_data_len = cap_header->len - total_header_size;
     if(pkt_data_len > 0)
     {
@@ -107,4 +104,6 @@ unsigned int decode_tcp(const unsigned char *header_start)
     printf("\t\t{{ Layer 4 :::: TCP Header }}\n");
     printf("\t\t{ Source Port: %hu\t", ntohs(tcp_hdr->tcp_src_port));
     printf("Destination Port: %hu }\n", ntohs(tcp_hdr->tcp_des_port));
+
+    return header_size;
 }

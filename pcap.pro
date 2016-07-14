@@ -7,3 +7,5 @@ SOURCES += main.cpp
 
 HEADERS += \
     header.h
+
+LIBS += -lpcap
